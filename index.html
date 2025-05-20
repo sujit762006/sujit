@@ -1,0 +1,83 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forex Signal Bot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #333;
+    }
+    select, button {
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 16px;
+      width: 220px;
+    }
+    #signal {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Forex/Binary Trading Signal Bot</h1>
+
+  <label for="broker">Select Broker (Visual Only):</label><br>
+  <select id="broker">
+    <option>Quotex</option>
+    <option>IQ Option</option>
+    <option>Binomo</option>
+  </select><br>
+
+  <label for="pair">Select Currency Pair:</label><br>
+  <select id="pair">
+    {% for p in pairs %}
+    <option>{{ p }}</option>
+    {% endfor %}
+  </select><br>
+
+  <label for="timeframe">Select Timeframe:</label><br>
+  <select id="timeframe">
+    {% for key, value in timeframes.items() %}
+    <option value="{{ key }}">{{ value }}</option>
+    {% endfor %}
+  </select><br>
+
+  <button onclick="getSignal()">Get Signal</button>
+
+  <div id="signal">Signal: -</div>
+
+  <script>
+    function getSignal() {
+      const symbol = document.getElementById('pair').value;
+      const timeframe = document.getElementById('timeframe').value;
+
+      fetch('/signal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ symbol, timeframe })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('signal').textContent = "Signal: " + (data.signal || data.error);
+      })
+      .catch(err => {
+        document.getElementById('signal').textContent = "Signal: Error fetching data";
+      });
+    }
+  </script>
+</body>
+</html>
